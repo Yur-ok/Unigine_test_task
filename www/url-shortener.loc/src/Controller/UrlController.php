@@ -6,6 +6,7 @@ use App\Entity\Url;
 use App\Repository\UrlRepository;
 use App\Service\Url\UrlHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Service\Url\UrlService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,14 +16,17 @@ class UrlController extends AbstractController
 {
     private UrlRepository $urlRepository;
     private UrlHelper $urlHelper;
+    private UrlService $urlService;
 
     public function __construct(
         UrlRepository $urlRepository,
         UrlHelper     $urlHelper,
+        UrlService    $urlService
     )
     {
         $this->urlRepository = $urlRepository;
         $this->urlHelper = $urlHelper;
+        $this->urlService = $urlService;
     }
 
     /**
@@ -30,13 +34,7 @@ class UrlController extends AbstractController
      */
     public function encodeUrl(Request $request): JsonResponse
     {
-        $url = new Url();
-        $url->setUrl($request->get('url'));
-
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($url);
-        $entityManager->flush();
-
+        $url = $this->urlService->createOrFindByUrl($request->get('url'));
         return $this->json([
             'hash' => $url->getHash()
         ]);
@@ -47,10 +45,10 @@ class UrlController extends AbstractController
      */
     public function decodeUrl(Request $request): JsonResponse
     {
-        /** @var UrlRepository $urlRepository */
-        $urlRepository = $this->getDoctrine()->getRepository(Url::class);
-        $url = $urlRepository->findOneByHash($request->get('hash'));
-        if (empty ($url)) {
+//        /** @var UrlRepository $urlRepository */
+//        $this->urlRepository = $this->getDoctrine()->getRepository(Url::class);
+        $url = $this->urlRepository->findOneByHash($request->get('hash'));
+        if ($url === null) {
             return $this->json([
                 'error' => 'Non-existent hash.'
             ]);
