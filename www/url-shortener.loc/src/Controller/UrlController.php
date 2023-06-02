@@ -2,11 +2,10 @@
 
 namespace App\Controller;
 
-use App\Entity\Url;
 use App\Repository\UrlRepository;
 use App\Service\Url\UrlHelper;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Service\Url\UrlService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -45,12 +44,10 @@ class UrlController extends AbstractController
      */
     public function decodeUrl(Request $request): JsonResponse
     {
-//        /** @var UrlRepository $urlRepository */
-//        $this->urlRepository = $this->getDoctrine()->getRepository(Url::class);
         $url = $this->urlRepository->findOneByHash($request->get('hash'));
         if ($url === null) {
             return $this->json([
-                'error' => 'Non-existent hash.'
+                'error' => 'Non-existent hash or url is expired.'
             ]);
         }
         return $this->json([

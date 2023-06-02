@@ -32,6 +32,16 @@ class Url
      */
     private $createdDate;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $ttl;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isExpired;
+
     public function __construct()
     {
         $date = new \DateTimeImmutable();
@@ -76,6 +86,30 @@ class Url
     public function setCreatedDate(\DateTimeImmutable $createdDate): self
     {
         $this->createdDate = $createdDate;
+
+        return $this;
+    }
+
+    public function getTtl(): ?\DateTimeInterface
+    {
+        return $this->ttl;
+    }
+
+    public function setTtl(\DateTimeInterface $ttl): self
+    {
+        $this->ttl = $ttl;
+
+        return $this;
+    }
+
+    public function getIsExpired(): ?bool
+    {
+        return $this->isExpired;
+    }
+
+    public function setIsExpired(bool $isExpired): self
+    {
+        $this->isExpired = $isExpired;
 
         return $this;
     }

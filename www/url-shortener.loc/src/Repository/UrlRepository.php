@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Url;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\Persistence\ManagerRegistry;
 use function Doctrine\ORM\QueryBuilder;
 
@@ -24,6 +25,7 @@ class UrlRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('u')
             ->andWhere('u.hash = :val')
+            ->andWhere('u.isExpired = 0')
             ->setParameter('val', $value)
             ->getQuery()
             ->getOneOrNullResult();
@@ -50,5 +52,15 @@ class UrlRepository extends ServiceEntityRepository
         $qb->setParameter('newUrl', $url);
 
         return $qb->getQuery()->getSingleScalarResult() > 0;
+    }
+
+    public function updateIsExpired(): void
+    {
+        $this->getEntityManager()
+            ->createNativeQuery(
+                'START TRANSACTION; UPDATE url SET is_expired = 1 WHERE is_expired = 0 AND NOW() > ADDDATE(created_date, INTERVAL ttl SECOND); COMMIT;',
+                new ResultSetMapping()
+            )
+        ->execute();
     }
 }
