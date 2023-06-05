@@ -21,6 +21,16 @@ class UrlRepository extends ServiceEntityRepository
         parent::__construct($registry, Url::class);
     }
 
+    public function save(Url $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->persist($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+
+    }
+
     public function findOneByHash(string $value): ?Url
     {
         return $this->createQueryBuilder('u')
@@ -31,6 +41,7 @@ class UrlRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+
     public function findOneByUrl(string $value): ?Url
     {
         return $this->createQueryBuilder('u')
@@ -39,7 +50,6 @@ class UrlRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
-
 
     public function isExistUrl(string $url): bool
     {
@@ -61,6 +71,15 @@ class UrlRepository extends ServiceEntityRepository
                 'START TRANSACTION; UPDATE url SET is_expired = 1 WHERE is_expired = 0 AND NOW() > ADDDATE(created_date, INTERVAL ttl SECOND); COMMIT;',
                 new ResultSetMapping()
             )
-        ->execute();
+            ->execute();
+    }
+
+    public function findAllUnprocessed(): array
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.isSendToEndpoint = :val')
+            ->setParameter('val', 0)
+            ->getQuery()
+            ->getResult();
     }
 }

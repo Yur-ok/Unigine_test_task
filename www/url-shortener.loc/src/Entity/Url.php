@@ -15,32 +15,37 @@ class Url
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private ?int $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $url;
+    private ?string $url;
 
     /**
      * @ORM\Column(type="string", length=14)
      */
-    private $hash;
+    private ?string $hash;
 
     /**
      * @ORM\Column(name="created_date", type="datetime_immutable")
      */
-    private $createdDate;
+    private ?\DateTimeImmutable $createdDate;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $ttl;
+    private ?int $ttl;
 
     /**
      * @ORM\Column(type="boolean")
      */
-    private $isExpired;
+    private ?bool $isExpired;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private ?bool $isSendToEndpoint;
 
     public function __construct()
     {
@@ -90,12 +95,12 @@ class Url
         return $this;
     }
 
-    public function getTtl(): ?\DateTimeInterface
+    public function getTtl(): ?int
     {
         return $this->ttl;
     }
 
-    public function setTtl(\DateTimeInterface $ttl): self
+    public function setTtl(int $ttl): self
     {
         $this->ttl = $ttl;
 
@@ -110,6 +115,18 @@ class Url
     public function setIsExpired(bool $isExpired): self
     {
         $this->isExpired = $isExpired;
+
+        return $this;
+    }
+
+    public function getIsSendToEndpoint(): ?bool
+    {
+        return $this->isSendToEndpoint;
+    }
+
+    public function setIsSendToEndpoint(bool $isSendToEndpoint): self
+    {
+        $this->isSendToEndpoint = $isSendToEndpoint;
 
         return $this;
     }

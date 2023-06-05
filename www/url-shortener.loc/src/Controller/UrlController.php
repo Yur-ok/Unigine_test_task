@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Repository\UrlRepository;
-use App\Service\Url\UrlHelper;
 use App\Service\Url\UrlService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,17 +13,14 @@ use Symfony\Component\Routing\Annotation\Route;
 class UrlController extends AbstractController
 {
     private UrlRepository $urlRepository;
-    private UrlHelper $urlHelper;
     private UrlService $urlService;
 
     public function __construct(
         UrlRepository $urlRepository,
-        UrlHelper     $urlHelper,
         UrlService    $urlService
     )
     {
         $this->urlRepository = $urlRepository;
-        $this->urlHelper = $urlHelper;
         $this->urlService = $urlService;
     }
 
@@ -65,9 +61,9 @@ class UrlController extends AbstractController
         $url = $this->urlRepository->findOneByHash($request->get('hash'));
 
         if ($url === null) {
-            $this->createNotFoundException('Non-existent hash');
+            $this->json(['error' => 'Non-existent hash']);
         }
 
-        return $this->redirect($this->urlHelper->addScheme($url->getUrl()));
+        return $this->redirect($url->getUrl());
     }
 }
